@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Notus.Validator" Version="2.0.20" />
+    <PackageReference Include="Notus.Node" Version="3.0.4" />
   </ItemGroup>
 
 </Project>

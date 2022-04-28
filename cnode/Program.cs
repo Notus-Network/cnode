@@ -11,7 +11,7 @@ namespace cnode
         private static bool LightNodeActive = false;
         private static bool EmptyTimerActive = false;
         private static bool CryptoTimerActive = false;
-        private static Notus.Variable.Common.ClassSetting NodeSettings = new Notus.Variable.Common.ClassSetting();
+        private static Notus.Kernel.Common.ClassSetting NodeSettings = new Notus.Kernel.Common.ClassSetting();
 
         static void StartAsMain()
         {
@@ -26,7 +26,7 @@ namespace cnode
                     MainObj.Start();
                 }
 
-                Notus.ToolBox.Extension.Print(NodeSettings.InfoMode, "Sleep For 2.5 Seconds");
+                Notus.Core.Function.Print(NodeSettings.InfoMode, "Sleep For 2.5 Seconds");
                 Thread.Sleep(2500);
             }
         }
@@ -44,19 +44,19 @@ namespace cnode
         {
             try
             {
-                Notus.ToolBox.Extension.NodeFolderControl();
+                Notus.Kernel.Function.NodeFolderControl();
 
-                using (Notus.Mempool ObjMp_Node = new Notus.Mempool("local_db" + System.IO.Path.DirectorySeparatorChar + GetNetworkTypeStr() + "node_settings"))
+                using (Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool("local_db" + System.IO.Path.DirectorySeparatorChar + GetNetworkTypeStr() + "node_settings"))
                 {
                     ObjMp_Node.AsyncActive = false;
                     
-                    using (Notus.Encryption.Cipher Obj_Cipher = new Notus.Encryption.Cipher())
+                    using (Notus.Kernel.Encryption.Cipher Obj_Cipher = new Notus.Kernel.Encryption.Cipher())
                     {
                         string NodeKeyStr = ObjMp_Node.Get("node_key", "");
                         if (NodeKeyStr.Length == 0)
                         {
 
-                            NodeSettings.NodeWallet = Notus.Wallet.ID.GenerateKeyPair(NodeSettings.Network);
+                            NodeSettings.NodeWallet = Notus.Core.Wallet.ID.GenerateKeyPair(NodeSettings.Network);
                             if (Const_EncryptionActivated == true)
                             {
                                 ObjMp_Node.Set("node_key",
@@ -75,13 +75,13 @@ namespace cnode
                         {
                             if (Const_EncryptionActivated == true)
                             {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(
+                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Core.Variable.EccKeyPair>(
                                     Obj_Cipher.Decrypt(NodeKeyStr, "", NodeSettings.EncryptKey, NodeSettings.EncryptKey)
                                 );
                             }
                             else
                             {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(NodeKeyStr);
+                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Core.Variable.EccKeyPair>(NodeKeyStr);
                             }
                         }
                     }
@@ -151,8 +151,8 @@ namespace cnode
             );
             NodeSettings.EncryptKey = Const_EncryptKey;
 
-            NodeSettings.Network = Notus.Variable.Constant.NetworkType.Const_MainNetwork;
-            NodeSettings.NodeType = Notus.Variable.Constant.NetworkNodeType.Suitable;
+            NodeSettings.Network = Notus.Core.Variable.NetworkType.Const_MainNetwork;
+            NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Suitable;
 
             NodeSettings.PrettyJson = true;
             NodeSettings.GenesisAssigned = false;
@@ -179,19 +179,19 @@ namespace cnode
                     }
                     if (string.Equals(args[a], "--replicant"))
                     {
-                        NodeSettings.NodeType = Notus.Variable.Constant.NetworkNodeType.Replicant;
+                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant;
                     }
                     if (string.Equals(args[a], "--test-network"))
                     {
-                        NodeSettings.Network = Notus.Variable.Constant.NetworkType.Const_TestNetwork;
+                        NodeSettings.Network = Notus.Core.Variable.NetworkType.Const_TestNetwork;
                     }
                     if (string.Equals(args[a], "--main"))
                     {
-                        NodeSettings.NodeType = Notus.Variable.Constant.NetworkNodeType.Main;
+                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Main;
                     }
                     if (string.Equals(args[a], "--master"))
                     {
-                        NodeSettings.NodeType = Notus.Variable.Constant.NetworkNodeType.Master;
+                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Master;
                     }
                     if (string.Equals(args[a], "--debug"))
                     {
@@ -206,7 +206,7 @@ namespace cnode
 
             LoadOrGenerateNodeWallet();
 
-            if (NodeSettings.NodeType != Notus.Variable.Constant.NetworkNodeType.Replicant)
+            if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
             {
                 LightNodeActive = false;
             }
@@ -220,25 +220,26 @@ namespace cnode
 
             switch (NodeSettings.NodeType)
             {
-                case Notus.Variable.Constant.NetworkNodeType.Main:
+                case Notus.Kernel.Variable.Constant.NetworkNodeType.Main:
                     StartAsMain();
                     break;
 
-                case Notus.Variable.Constant.NetworkNodeType.Master:
+                case Notus.Kernel.Variable.Constant.NetworkNodeType.Master:
 
                     break;
 
-                case Notus.Variable.Constant.NetworkNodeType.Replicant:
+                case Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant:
                     StartAsReplicant();
                     break;
 
                 default:
                     break;
             }
-            Notus.ToolBox.Extension.PrintWarning(true, "Task Ended");
+
+            Notus.Core.Function.PrintWarning(true, "Task Ended");
         }
 
-        static void StartAsMaster(Notus.Variable.Struct.NodeIpInfo IpInfoObj)
+        static void StartAsMaster(Notus.Kernel.Variable.Struct.NodeIpInfo IpInfoObj)
         {
 
         }
@@ -259,13 +260,13 @@ namespace cnode
                 }
                 catch (Exception err)
                 {
-                    Notus.ToolBox.Extension.PrintDanger(true, "Replicant Outer Error Text : " + err.Message);
+                    Notus.Core.Function.PrintDanger(true, "Replicant Outer Error Text : " + err.Message);
                 }
             }
         }
         private static string GetNetworkTypeStr()
         {
-            return (NodeSettings.Network == Notus.Variable.Constant.NetworkType.Const_MainNetwork ? "main_" : "test_");
+            return (NodeSettings.Network == Notus.Core.Variable.NetworkType.Const_MainNetwork ? "main_" : "test_");
         }
         private static string GenerateEnryptKey()
         {
