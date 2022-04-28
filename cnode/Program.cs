@@ -45,8 +45,14 @@ namespace cnode
             try
             {
                 Notus.Kernel.Function.NodeFolderControl();
-
-                using (Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool("local_db" + System.IO.Path.DirectorySeparatorChar + GetNetworkTypeStr() + "node_settings"))
+                
+                using (
+                    Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
+                        "local_db" + 
+                        System.IO.Path.DirectorySeparatorChar + 
+                        Notus.Core.Function.NetworkTypeStr(NodeSettings.Network) + "node_settings"
+                    )
+                )
                 {
                     ObjMp_Node.AsyncActive = false;
                     
@@ -263,10 +269,6 @@ namespace cnode
                     Notus.Core.Function.PrintDanger(true, "Replicant Outer Error Text : " + err.Message);
                 }
             }
-        }
-        private static string GetNetworkTypeStr()
-        {
-            return (NodeSettings.Network == Notus.Core.Variable.NetworkType.Const_MainNetwork ? "main_" : "test_");
         }
         private static string GenerateEnryptKey()
         {
