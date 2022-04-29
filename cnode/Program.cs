@@ -13,25 +13,6 @@ namespace cnode
         private static bool CryptoTimerActive = false;
         private static Notus.Kernel.Common.ClassSetting NodeSettings = new Notus.Kernel.Common.ClassSetting();
 
-        static void StartAsMain()
-        {
-            bool exitOuterLoop = false;
-            while (exitOuterLoop == false)
-            {
-                using (Notus.Validator.Main MainObj = new Notus.Validator.Main(false))
-                {
-                    MainObj.Settings = NodeSettings;
-                    MainObj.EmptyTimerActive = EmptyTimerActive;
-                    MainObj.CryptoTimerActive = CryptoTimerActive;
-                    MainObj.Start();
-                }
-
-                Notus.Core.Function.Print(NodeSettings.InfoMode, "Sleep For 2.5 Seconds");
-                Thread.Sleep(2500);
-            }
-        }
-
-
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Console.WriteLine((e.ExceptionObject as Exception).Message, "Unhandled UI Exception");
@@ -150,11 +131,7 @@ namespace cnode
             NodeSettings.DebugMode = true;
 
             NodeSettings.EncryptMode = Const_EncryptionActivated;
-            NodeSettings.HashSalt = new Notus.Hash().CommonSign("sasha",
-                    new Notus.Hash().CommonSign("sha1", NodeSettings.EncryptKey) +
-                    "-" +
-                    new Random().Next(70000000, 90000000).ToString("x")
-            );
+            NodeSettings.HashSalt = Notus.Core.Function.GenerateSalt();
             NodeSettings.EncryptKey = Const_EncryptKey;
 
             NodeSettings.Network = Notus.Core.Variable.NetworkType.Const_MainNetwork;
@@ -216,78 +193,7 @@ namespace cnode
             {
                 LightNodeActive = false;
             }
-
-            using (Notus.Validator.Identify IdentifyObj = new Notus.Validator.Identify())
-            {
-                IdentifyObj.Settings = NodeSettings;
-                IdentifyObj.Timeout = 3;
-                NodeSettings = IdentifyObj.Execute();
-            }
-
-            switch (NodeSettings.NodeType)
-            {
-                case Notus.Kernel.Variable.Constant.NetworkNodeType.Main:
-                    StartAsMain();
-                    break;
-
-                case Notus.Kernel.Variable.Constant.NetworkNodeType.Master:
-
-                    break;
-
-                case Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant:
-                    StartAsReplicant();
-                    break;
-
-                default:
-                    break;
-            }
-
-            Notus.Core.Function.PrintWarning(true, "Task Ended");
-        }
-
-        static void StartAsMaster(Notus.Kernel.Variable.Struct.NodeIpInfo IpInfoObj)
-        {
-
-        }
-
-        static void StartAsReplicant()
-        {
-            bool exitOuterLoop = false;
-            while (exitOuterLoop == false)
-            {
-                try
-                {
-                    using (Notus.Validator.Replicant ReplicantObj = new Notus.Validator.Replicant(false))
-                    {
-                        ReplicantObj.Settings = NodeSettings;
-                        ReplicantObj.LightNode = LightNodeActive;
-                        ReplicantObj.Start();
-                    }
-                }
-                catch (Exception err)
-                {
-                    Notus.Core.Function.PrintDanger(true, "Replicant Outer Error Text : " + err.Message);
-                }
-            }
-        }
-        private static string GenerateEnryptKey()
-        {
-            return new Notus.Hash().CommonSign(
-                "sasha",
-                new Notus.Hash().CommonSign(
-                    "sha1",
-                    new Notus.Hash().CommonSign(
-                        "md5",
-                        DateTime.Now.AddMilliseconds(1000).Ticks.ToString("x") + "-" +
-                        DateTime.Now.AddSeconds(150).ToUniversalTime().ToLongTimeString() + "-" +
-                        new Random().Next(10000000, 30000000).ToString("x")
-                    ) + ":" +
-                    DateTime.Now.AddDays(1).Ticks.ToString("x") + "-" +
-                    new Random().Next(40000000, 60000000).ToString("x")
-                ) + " # " +
-                DateTime.Now.AddHours(40).Ticks.ToString("x") + "-" +
-                new Random().Next(70000000, 90000000).ToString("x")
-            );
+            Notus.Network.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
         }
     }
 }
