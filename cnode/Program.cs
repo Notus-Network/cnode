@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using System.Threading;
 namespace cnode
@@ -13,9 +14,16 @@ namespace cnode
         private static bool CryptoTimerActive = false;
         private static Notus.Kernel.Common.ClassSetting NodeSettings = new Notus.Kernel.Common.ClassSetting();
 
+        private static void FirstChanceExceptionEventHandler(object sender, FirstChanceExceptionEventArgs e)
+        {
+            Console.WriteLine(e.Exception.Message, "Unhandled FirstChanceExceptionEventArgs Exception");
+            Console.WriteLine(sender.ToString());
+            Console.WriteLine("press enter to continue");
+            Console.ReadLine();
+        }
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.WriteLine((e.ExceptionObject as Exception).Message, "Unhandled UI Exception");
+            Console.WriteLine((e.ExceptionObject as Exception).Message, "Unhandled UnhandledExceptionEventArgs Exception");
             Console.WriteLine(sender.ToString());
             Console.WriteLine("press enter to continue");
             Console.ReadLine();
@@ -26,12 +34,12 @@ namespace cnode
             try
             {
                 Notus.Kernel.Function.NodeFolderControl();
-                
+                //NodeSettings.Network
                 using (
                     Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
-                        "local_db" + 
+                        Notus.Core.Function.NetworkTypeText(NodeSettings.Network) + 
                         System.IO.Path.DirectorySeparatorChar + 
-                        Notus.Core.Function.NetworkTypeStr(NodeSettings.Network) + "node_settings"
+                        Notus.Core.Function.NetworkTypeText(NodeSettings.Network) + "node_settings"
                     )
                 )
                 {
@@ -83,6 +91,11 @@ namespace cnode
                 Console.ReadLine();
             }
         }
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        //[STAThread]
         static void Main(string[] args)
         {
             /*
@@ -125,8 +138,10 @@ namespace cnode
                 http://94.101.87.42:5000/transaction/status/13489f62ef340cb3edfaa162fc0a5ab65c45b89e320574646584ca04d4cfd0e866f4e3bd836079cc46b762b8f5
                 http://94.101.87.42:5000/transaction/status/_Kayıt_Esnasında_Verilen_Uid_Değeri
             */
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-
+            
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
+            
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
 
@@ -134,20 +149,45 @@ namespace cnode
             NodeSettings.HashSalt = Notus.Core.Function.GenerateSalt();
             NodeSettings.EncryptKey = Const_EncryptKey;
 
-            NodeSettings.Network = Notus.Core.Variable.NetworkType.Const_MainNetwork;
+            NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
             NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Suitable;
 
             NodeSettings.PrettyJson = true;
             NodeSettings.GenesisAssigned = false;
 
             NodeSettings.WaitTickCount = 4;
-            //AppDomain.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+            CheckParameter(args);
+            
 
+            LoadOrGenerateNodeWallet();
+
+            if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
+            {
+                LightNodeActive = false;
+            }
+            Notus.Network.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
+        }
+        static void CheckParameter(string[] args)
+        {
             if (args.Length > 0)
             {
                 NodeSettings.DebugMode = false;
                 for (int a = 0; a < args.Length; a++)
                 {
+                    if (string.Equals(args[a], "--testnet"))
+                    {
+                        NodeSettings.Network = Notus.Core.Variable.NetworkType.TestNet;
+                    }
+                    if (string.Equals(args[a], "--mainnet"))
+                    {
+                        NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
+                    }
+                    if (string.Equals(args[a], "--devnet"))
+                    {
+                        NodeSettings.Network = Notus.Core.Variable.NetworkType.DevNet;
+                    }
+
+
                     if (string.Equals(args[a], "--empty"))
                     {
                         EmptyTimerActive = true;
@@ -160,13 +200,11 @@ namespace cnode
                     {
                         LightNodeActive = true;
                     }
+
+
                     if (string.Equals(args[a], "--replicant"))
                     {
                         NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant;
-                    }
-                    if (string.Equals(args[a], "--test-network"))
-                    {
-                        NodeSettings.Network = Notus.Core.Variable.NetworkType.Const_TestNetwork;
                     }
                     if (string.Equals(args[a], "--main"))
                     {
@@ -176,6 +214,8 @@ namespace cnode
                     {
                         NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Master;
                     }
+
+
                     if (string.Equals(args[a], "--debug"))
                     {
                         NodeSettings.DebugMode = true;
@@ -186,14 +226,6 @@ namespace cnode
                     }
                 }
             }
-
-            LoadOrGenerateNodeWallet();
-
-            if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
-            {
-                LightNodeActive = false;
-            }
-            Notus.Network.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
         }
     }
 }
