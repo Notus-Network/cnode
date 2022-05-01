@@ -37,9 +37,8 @@ namespace cnode
                 //NodeSettings.Network
                 using (
                     Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
-                        Notus.Core.Function.NetworkTypeText(NodeSettings.Network) + 
-                        System.IO.Path.DirectorySeparatorChar + 
-                        Notus.Core.Function.NetworkTypeText(NodeSettings.Network) + "node_settings"
+                        Notus.Kernel.Function.GetFolderName(NodeSettings.Network, Notus.Kernel.Variable.Constant.StorageFolderName.Common) + 
+                        "node_settings"
                     )
                 )
                 {
@@ -140,7 +139,7 @@ namespace cnode
             */
             
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
+            //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
             
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
