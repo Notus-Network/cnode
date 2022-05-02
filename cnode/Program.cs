@@ -33,7 +33,7 @@ namespace cnode
         {
             try
             {
-                Notus.Kernel.Function.NodeFolderControl();
+                //Notus.Kernel.Function.NodeFolderControl();
                 //NodeSettings.Network
                 using (
                     Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
@@ -137,7 +137,7 @@ namespace cnode
                 http://94.101.87.42:5000/transaction/status/13489f62ef340cb3edfaa162fc0a5ab65c45b89e320574646584ca04d4cfd0e866f4e3bd836079cc46b762b8f5
                 http://94.101.87.42:5000/transaction/status/_Kayıt_Esnasında_Verilen_Uid_Değeri
             */
-            
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
             
@@ -156,8 +156,8 @@ namespace cnode
 
             NodeSettings.WaitTickCount = 4;
             CheckParameter(args);
-            
 
+            Notus.Kernel.Function.NodeFolderControl(NodeSettings.Network);
             LoadOrGenerateNodeWallet();
 
             if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
