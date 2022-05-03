@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Notus.Node" Version="3.0.24" />
+    <PackageReference Include="Notus.Node" Version="3.0.28" />
   </ItemGroup>
 
 </Project>

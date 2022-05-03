@@ -139,8 +139,11 @@ namespace cnode
             */
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize
+            //AppDomain.CurrentDomain.MonitoringSurvivedMemorySize
+            //AppDomain.CurrentDomain.MonitoringTotalProcessorTime
             //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
-            
+
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
 
