@@ -27,7 +27,6 @@ namespace cnode
             Console.WriteLine(sender.ToString());
             Console.WriteLine("press enter to continue");
             Console.ReadLine();
-            // here you can log the exception ...
         }
         static void LoadOrGenerateNodeWallet()
         {
