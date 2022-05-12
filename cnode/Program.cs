@@ -36,7 +36,7 @@ namespace cnode
                 //NodeSettings.Network
                 using (
                     Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
-                        Notus.Kernel.Function.GetFolderName(NodeSettings.Network, Notus.Kernel.Variable.Constant.StorageFolderName.Common) + 
+                        Notus.Kernel.Function.GetFolderName(NodeSettings.Network, NodeSettings.Layer, Notus.Kernel.Variable.Constant.StorageFolderName.Common) + 
                         "node_settings"
                     )
                 )
@@ -93,7 +93,7 @@ namespace cnode
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        //[STAThread]
+
         static void Main(string[] args)
         {
             /*
@@ -145,11 +145,13 @@ namespace cnode
 
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
+            
 
             NodeSettings.EncryptMode = Const_EncryptionActivated;
             NodeSettings.HashSalt = Notus.Core.Function.GenerateSalt();
             NodeSettings.EncryptKey = Const_EncryptKey;
 
+            NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer1;
             NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
             NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Suitable;
 
@@ -159,7 +161,7 @@ namespace cnode
             NodeSettings.WaitTickCount = 4;
             CheckParameter(args);
 
-            Notus.Kernel.Function.NodeFolderControl(NodeSettings.Network);
+            Notus.Kernel.Function.NodeFolderControl(NodeSettings.Network,NodeSettings.Layer);
             LoadOrGenerateNodeWallet();
 
             if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
@@ -224,6 +226,32 @@ namespace cnode
                     if (string.Equals(args[a], "--info"))
                     {
                         NodeSettings.InfoMode = true;
+                    }
+
+
+                    if (string.Equals(args[a], "--layer1"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer1;
+                    }
+                    if (string.Equals(args[a], "--layer2"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer2;
+                    }
+                    if (string.Equals(args[a], "--layer3"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer3;
+                    }
+                    if (string.Equals(args[a], "--layer4"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer4;
+                    }
+                    if (string.Equals(args[a], "--layer5"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer5;
+                    }
+                    if (string.Equals(args[a], "--layer6"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer6;
                     }
                 }
             }
