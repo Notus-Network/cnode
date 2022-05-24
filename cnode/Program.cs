@@ -253,6 +253,28 @@ namespace cnode
                     {
                         NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer6;
                     }
+                    if (string.Equals(args[a], "--layer7"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer7;
+                    }
+                    if (string.Equals(args[a], "--layer8"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer8;
+                    }
+                    if (string.Equals(args[a], "--layer9"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer9;
+                    }
+                    if (string.Equals(args[a], "--layer10"))
+                    {
+                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer10;
+                    }
+                }
+
+                if (NodeSettings.Layer != Notus.Core.Variable.NetworkLayer.Layer1)
+                {
+                    CryptoTimerActive = false;
+                    EmptyTimerActive = false;
                 }
             }
         }
