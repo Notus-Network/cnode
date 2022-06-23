@@ -151,6 +151,7 @@ namespace cnode
             NodeSettings.HashSalt = Notus.Core.Function.GenerateSalt();
             NodeSettings.EncryptKey = Const_EncryptKey;
 
+            NodeSettings.SynchronousSocketIsActive = true;
             NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer1;
             NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
             NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Suitable;
