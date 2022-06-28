@@ -143,6 +143,7 @@ namespace cnode
             //AppDomain.CurrentDomain.MonitoringTotalProcessorTime
             //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
 
+            NodeSettings.LocalNode = true;
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
             
@@ -169,6 +170,7 @@ namespace cnode
             {
                 LightNodeActive = false;
             }
+            CryptoTimerActive = true;
             Notus.Network.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
         }
         static void CheckParameter(string[] args)
