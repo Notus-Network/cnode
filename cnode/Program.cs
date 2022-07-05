@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
 using System.Text.Json;
-using System.Threading;
 namespace cnode
 {
     class Program
@@ -12,7 +11,7 @@ namespace cnode
         private static bool LightNodeActive = false;
         private static bool EmptyTimerActive = false;
         private static bool CryptoTimerActive = false;
-        private static Notus.Kernel.Common.ClassSetting NodeSettings = new Notus.Kernel.Common.ClassSetting();
+        private static Notus.Variable.Common.ClassSetting NodeSettings = new Notus.Variable.Common.ClassSetting();
 
         private static void FirstChanceExceptionEventHandler(object sender, FirstChanceExceptionEventArgs e)
         {
@@ -35,21 +34,21 @@ namespace cnode
                 //Notus.Kernel.Function.NodeFolderControl();
                 //NodeSettings.Network
                 using (
-                    Notus.Kernel.Mempool ObjMp_Node = new Notus.Kernel.Mempool(
-                        Notus.Kernel.Function.GetFolderName(NodeSettings.Network, NodeSettings.Layer, Notus.Kernel.Variable.Constant.StorageFolderName.Common) + 
+                    Notus.Mempool ObjMp_Node = new Notus.Mempool(
+                        Notus.Toolbox.IO.GetFolderName(NodeSettings.Network, NodeSettings.Layer, Notus.Variable.Constant.StorageFolderName.Common) +
                         "node_settings"
                     )
                 )
                 {
                     ObjMp_Node.AsyncActive = false;
-                    
-                    using (Notus.Kernel.Encryption.Cipher Obj_Cipher = new Notus.Kernel.Encryption.Cipher())
+
+                    using (Notus.Encryption.Cipher Obj_Cipher = new Notus.Encryption.Cipher())
                     {
                         string NodeKeyStr = ObjMp_Node.Get("node_key", "");
                         if (NodeKeyStr.Length == 0)
                         {
 
-                            NodeSettings.NodeWallet = Notus.Core.Wallet.ID.GenerateKeyPair(NodeSettings.Network);
+                            NodeSettings.NodeWallet = Notus.Wallet.ID.GenerateKeyPair(NodeSettings.Network);
                             if (Const_EncryptionActivated == true)
                             {
                                 ObjMp_Node.Set("node_key",
@@ -68,13 +67,13 @@ namespace cnode
                         {
                             if (Const_EncryptionActivated == true)
                             {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Core.Variable.EccKeyPair>(
+                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(
                                     Obj_Cipher.Decrypt(NodeKeyStr, "", NodeSettings.EncryptKey, NodeSettings.EncryptKey)
                                 );
                             }
                             else
                             {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Core.Variable.EccKeyPair>(NodeKeyStr);
+                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(NodeKeyStr);
                             }
                         }
                     }
@@ -146,16 +145,16 @@ namespace cnode
             NodeSettings.LocalNode = true;
             NodeSettings.InfoMode = true;
             NodeSettings.DebugMode = true;
-            
+
 
             NodeSettings.EncryptMode = Const_EncryptionActivated;
-            NodeSettings.HashSalt = Notus.Core.Function.GenerateSalt();
+            NodeSettings.HashSalt = Notus.Encryption.Toolbox.GenerateSalt();
             NodeSettings.EncryptKey = Const_EncryptKey;
 
             NodeSettings.SynchronousSocketIsActive = true;
-            NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer1;
-            NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
-            NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Suitable;
+            NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer1;
+            NodeSettings.Network = Notus.Variable.Enum.NetworkType.MainNet;
+            NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Suitable;
 
             NodeSettings.PrettyJson = true;
             NodeSettings.GenesisAssigned = false;
@@ -163,34 +162,34 @@ namespace cnode
             NodeSettings.WaitTickCount = 4;
             CheckParameter(args);
 
-            Notus.Kernel.Function.NodeFolderControl(NodeSettings.Network,NodeSettings.Layer);
+            Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
             LoadOrGenerateNodeWallet();
 
-            if (NodeSettings.NodeType != Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant)
+            if (NodeSettings.NodeType != Notus.Variable.Enum.NetworkNodeType.Replicant)
             {
                 LightNodeActive = false;
             }
             CryptoTimerActive = true;
-            Notus.Network.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
+            Notus.Validator.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
         }
         static void CheckParameter(string[] args)
         {
             if (args.Length > 0)
             {
-                NodeSettings.DebugMode = false;
+                //NodeSettings.DebugMode = false;
                 for (int a = 0; a < args.Length; a++)
                 {
                     if (string.Equals(args[a], "--testnet"))
                     {
-                        NodeSettings.Network = Notus.Core.Variable.NetworkType.TestNet;
+                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.TestNet;
                     }
                     if (string.Equals(args[a], "--mainnet"))
                     {
-                        NodeSettings.Network = Notus.Core.Variable.NetworkType.MainNet;
+                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.MainNet;
                     }
                     if (string.Equals(args[a], "--devnet"))
                     {
-                        NodeSettings.Network = Notus.Core.Variable.NetworkType.DevNet;
+                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.DevNet;
                     }
 
 
@@ -210,15 +209,15 @@ namespace cnode
 
                     if (string.Equals(args[a], "--replicant"))
                     {
-                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Replicant;
+                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Replicant;
                     }
                     if (string.Equals(args[a], "--main"))
                     {
-                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Main;
+                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Main;
                     }
                     if (string.Equals(args[a], "--master"))
                     {
-                        NodeSettings.NodeType = Notus.Kernel.Variable.Constant.NetworkNodeType.Master;
+                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Master;
                     }
 
 
@@ -234,50 +233,59 @@ namespace cnode
 
                     if (string.Equals(args[a], "--layer1"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer1;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer1;
                     }
                     if (string.Equals(args[a], "--layer2"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer2;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer2;
                     }
                     if (string.Equals(args[a], "--layer3"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer3;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer3;
                     }
                     if (string.Equals(args[a], "--layer4"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer4;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer4;
                     }
                     if (string.Equals(args[a], "--layer5"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer5;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer5;
                     }
                     if (string.Equals(args[a], "--layer6"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer6;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer6;
                     }
                     if (string.Equals(args[a], "--layer7"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer7;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer7;
                     }
                     if (string.Equals(args[a], "--layer8"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer8;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer8;
                     }
                     if (string.Equals(args[a], "--layer9"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer9;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer9;
                     }
                     if (string.Equals(args[a], "--layer10"))
                     {
-                        NodeSettings.Layer = Notus.Core.Variable.NetworkLayer.Layer10;
+                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer10;
                     }
                 }
 
-                if (NodeSettings.Layer != Notus.Core.Variable.NetworkLayer.Layer1)
+                if (NodeSettings.Layer != Notus.Variable.Enum.NetworkLayer.Layer1)
                 {
                     CryptoTimerActive = false;
                     EmptyTimerActive = false;
+                }
+            }
+            else
+            {
+                using(Notus.Validator.Menu menuObj=new Notus.Validator.Menu())
+                {
+                    menuObj.Start();
+                    Console.WriteLine("test-1");
+                    Console.WriteLine("test-2");
                 }
             }
         }
