@@ -141,29 +141,47 @@ namespace cnode
             //AppDomain.CurrentDomain.MonitoringSurvivedMemorySize
             //AppDomain.CurrentDomain.MonitoringTotalProcessorTime
             //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
+            NodeSettings = new Notus.Variable.Common.ClassSetting()
+            {
+                LocalNode = true,
+                InfoMode = true,
+                DebugMode = true,
 
-            NodeSettings.LocalNode = true;
-            NodeSettings.InfoMode = true;
-            NodeSettings.DebugMode = true;
+                EncryptMode = Const_EncryptionActivated,
+                HashSalt = Notus.Encryption.Toolbox.GenerateSalt(),
+                EncryptKey = Const_EncryptKey,
+
+                SynchronousSocketIsActive = true,
+                Layer = Notus.Variable.Enum.NetworkLayer.Layer1,
+                Network = Notus.Variable.Enum.NetworkType.MainNet,
+                NodeType = Notus.Variable.Enum.NetworkNodeType.Suitable,
+
+                NodeWallet = new Notus.Variable.Struct.EccKeyPair()
+                {
+                    CurveName = "",
+                    PrivateKey = "",
+                    PublicKey = "",
+                    WalletKey = "",
+                    Words = new string[] { },
+                },
+                PrettyJson = true,
+                GenesisAssigned = false,
+
+                WaitTickCount = 4,
+                IpInfo = new Notus.Variable.Struct.NodeIpInfo()
+                {
+                    Local = "",
+                    Public = ""
+                },
+                ActiveLayer = new System.Collections.Generic.Dictionary<Notus.Variable.Enum.NetworkLayer, bool>(),
+                GenesisCreated = false,
+            };
 
 
-            NodeSettings.EncryptMode = Const_EncryptionActivated;
-            NodeSettings.HashSalt = Notus.Encryption.Toolbox.GenerateSalt();
-            NodeSettings.EncryptKey = Const_EncryptKey;
-
-            NodeSettings.SynchronousSocketIsActive = true;
-            NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer1;
-            NodeSettings.Network = Notus.Variable.Enum.NetworkType.MainNet;
-            NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Suitable;
-
-            NodeSettings.PrettyJson = true;
-            NodeSettings.GenesisAssigned = false;
-
-            NodeSettings.WaitTickCount = 4;
             CheckParameter(args);
 
             Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
-            LoadOrGenerateNodeWallet();
+            //LoadOrGenerateNodeWallet();
 
             if (NodeSettings.NodeType != Notus.Variable.Enum.NetworkNodeType.Replicant)
             {
@@ -281,11 +299,17 @@ namespace cnode
             }
             else
             {
-                using(Notus.Validator.Menu menuObj=new Notus.Validator.Menu())
+                using (Notus.Validator.Menu menuObj = new Notus.Validator.Menu())
                 {
                     menuObj.Start();
-                    Console.WriteLine("test-1");
-                    Console.WriteLine("test-2");
+                    NodeSettings = menuObj.DefineMySetting(NodeSettings);
+                    Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
+                    //Console.ReadLine();
+                    //Console.WriteLine("test-2");
+                }
+                if (NodeSettings.DevelopmentNode == true)
+                {
+
                 }
             }
         }
