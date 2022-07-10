@@ -27,72 +27,10 @@ namespace cnode
             Console.WriteLine("press enter to continue");
             Console.ReadLine();
         }
-        static void LoadOrGenerateNodeWallet()
-        {
-            try
-            {
-                //Notus.Kernel.Function.NodeFolderControl();
-                //NodeSettings.Network
-                using (
-                    Notus.Mempool ObjMp_Node = new Notus.Mempool(
-                        Notus.Toolbox.IO.GetFolderName(NodeSettings.Network, NodeSettings.Layer, Notus.Variable.Constant.StorageFolderName.Common) +
-                        "node_settings"
-                    )
-                )
-                {
-                    ObjMp_Node.AsyncActive = false;
-
-                    using (Notus.Encryption.Cipher Obj_Cipher = new Notus.Encryption.Cipher())
-                    {
-                        string NodeKeyStr = ObjMp_Node.Get("node_key", "");
-                        if (NodeKeyStr.Length == 0)
-                        {
-
-                            NodeSettings.NodeWallet = Notus.Wallet.ID.GenerateKeyPair(NodeSettings.Network);
-                            if (Const_EncryptionActivated == true)
-                            {
-                                ObjMp_Node.Set("node_key",
-                                    Obj_Cipher.Encrypt(
-                                        JsonSerializer.Serialize(NodeSettings.NodeWallet), "", NodeSettings.EncryptKey, NodeSettings.EncryptKey
-                                    ),
-                                    true
-                                );
-                            }
-                            else
-                            {
-                                ObjMp_Node.Set("node_key", JsonSerializer.Serialize(NodeSettings.NodeWallet), true);
-                            }
-                        }
-                        else
-                        {
-                            if (Const_EncryptionActivated == true)
-                            {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(
-                                    Obj_Cipher.Decrypt(NodeKeyStr, "", NodeSettings.EncryptKey, NodeSettings.EncryptKey)
-                                );
-                            }
-                            else
-                            {
-                                NodeSettings.NodeWallet = JsonSerializer.Deserialize<Notus.Variable.Struct.EccKeyPair>(NodeKeyStr);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine("hata olustu");
-                Console.WriteLine(err.Message);
-                Console.WriteLine("hata olustu");
-                Console.WriteLine();
-                Console.ReadLine();
-            }
-        }
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-
         static void Main(string[] args)
         {
             /*
@@ -160,10 +98,25 @@ namespace cnode
             NodeSettings.GenesisAssigned = false;
 
             NodeSettings.WaitTickCount = 4;
-            CheckParameter(args);
+
+            NodeSettings.DevelopmentNode = false;
+            NodeSettings.NodeWallet = new Notus.Variable.Struct.EccKeyPair()
+            {
+                CurveName = "",
+                PrivateKey = "",
+                PublicKey = "",
+                WalletKey = "",
+                Words = new string[] { },
+            };
+            NodeSettings.Port = new Notus.Variable.Struct.CommunicationPorts(){
+                MainNet =0,
+                TestNet=0,
+                DevNet=0
+            };
+
+        CheckParameter(args);
 
             Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
-            LoadOrGenerateNodeWallet();
 
             if (NodeSettings.NodeType != Notus.Variable.Enum.NetworkNodeType.Replicant)
             {
@@ -281,12 +234,18 @@ namespace cnode
             }
             else
             {
+                Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
+                Console.ReadLine();
+                //Notus.Variable.Struct.NodeInfo Settings;
                 using (Notus.Validator.Menu menuObj = new Notus.Validator.Menu())
                 {
                     menuObj.Start();
-                    Console.WriteLine("test-1");
-                    Console.WriteLine("test-2");
+                    NodeSettings=menuObj.DefineMySetting(NodeSettings);
+                    //Settings = menuObj.Settings;
                 }
+                Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
+
+                Console.ReadLine();
             }
         }
     }
