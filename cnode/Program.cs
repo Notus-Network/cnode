@@ -5,9 +5,6 @@ namespace cnode
 {
     class Program
     {
-        private const string Const_EncryptKey = "key-password-string";
-        private const bool Const_EncryptionActivated = false;
-
         private static bool LightNodeActive = false;
         private static bool EmptyTimerActive = false;
         private static bool CryptoTimerActive = false;
@@ -75,177 +72,29 @@ namespace cnode
             */
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            //AppDomain.CurrentDomain.MonitoringTotalAllocatedMemorySize
-            //AppDomain.CurrentDomain.MonitoringSurvivedMemorySize
-            //AppDomain.CurrentDomain.MonitoringTotalProcessorTime
-            //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
 
-            NodeSettings.LocalNode = true;
-            NodeSettings.InfoMode = true;
-            NodeSettings.DebugMode = true;
-
-
-            NodeSettings.EncryptMode = Const_EncryptionActivated;
-            NodeSettings.HashSalt = Notus.Encryption.Toolbox.GenerateSalt();
-            NodeSettings.EncryptKey = Const_EncryptKey;
-
-            NodeSettings.SynchronousSocketIsActive = true;
-            NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer1;
-            NodeSettings.Network = Notus.Variable.Enum.NetworkType.MainNet;
-            NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Suitable;
-
-            NodeSettings.PrettyJson = true;
-            NodeSettings.GenesisAssigned = false;
-
-            NodeSettings.WaitTickCount = 4;
-
-            NodeSettings.DevelopmentNode = false;
-            NodeSettings.NodeWallet = new Notus.Variable.Struct.EccKeyPair()
+            using (Notus.Validator.Menu menuObj = new Notus.Validator.Menu())
             {
-                CurveName = "",
-                PrivateKey = "",
-                PublicKey = "",
-                WalletKey = "",
-                Words = new string[] { },
-            };
-            NodeSettings.Port = new Notus.Variable.Struct.CommunicationPorts(){
-                MainNet =0,
-                TestNet=0,
-                DevNet=0
-            };
+                NodeSettings = menuObj.PreStart(args);
 
-        CheckParameter(args);
-
-            Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
-
+                menuObj.Start();
+                NodeSettings = menuObj.DefineMySetting(NodeSettings);
+                Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
+            }
             if (NodeSettings.NodeType != Notus.Variable.Enum.NetworkNodeType.Replicant)
             {
                 LightNodeActive = false;
             }
             CryptoTimerActive = true;
-            Notus.Validator.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
-        }
-        static void CheckParameter(string[] args)
-        {
-            if (args.Length > 0)
+
+            Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
+            Console.ReadLine();
+
+            if (NodeSettings.DevelopmentNode == true)
             {
-                //NodeSettings.DebugMode = false;
-                for (int a = 0; a < args.Length; a++)
-                {
-                    if (string.Equals(args[a], "--testnet"))
-                    {
-                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.TestNet;
-                    }
-                    if (string.Equals(args[a], "--mainnet"))
-                    {
-                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.MainNet;
-                    }
-                    if (string.Equals(args[a], "--devnet"))
-                    {
-                        NodeSettings.Network = Notus.Variable.Enum.NetworkType.DevNet;
-                    }
+                NodeSettings.Network = Notus.Variable.Enum.NetworkType.DevNet;
 
-
-                    if (string.Equals(args[a], "--empty"))
-                    {
-                        EmptyTimerActive = true;
-                    }
-                    if (string.Equals(args[a], "--crypto"))
-                    {
-                        CryptoTimerActive = true;
-                    }
-                    if (string.Equals(args[a], "--light"))
-                    {
-                        LightNodeActive = true;
-                    }
-
-
-                    if (string.Equals(args[a], "--replicant"))
-                    {
-                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Replicant;
-                    }
-                    if (string.Equals(args[a], "--main"))
-                    {
-                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Main;
-                    }
-                    if (string.Equals(args[a], "--master"))
-                    {
-                        NodeSettings.NodeType = Notus.Variable.Enum.NetworkNodeType.Master;
-                    }
-
-
-                    if (string.Equals(args[a], "--debug"))
-                    {
-                        NodeSettings.DebugMode = true;
-                    }
-                    if (string.Equals(args[a], "--info"))
-                    {
-                        NodeSettings.InfoMode = true;
-                    }
-
-
-                    if (string.Equals(args[a], "--layer1"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer1;
-                    }
-                    if (string.Equals(args[a], "--layer2"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer2;
-                    }
-                    if (string.Equals(args[a], "--layer3"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer3;
-                    }
-                    if (string.Equals(args[a], "--layer4"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer4;
-                    }
-                    if (string.Equals(args[a], "--layer5"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer5;
-                    }
-                    if (string.Equals(args[a], "--layer6"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer6;
-                    }
-                    if (string.Equals(args[a], "--layer7"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer7;
-                    }
-                    if (string.Equals(args[a], "--layer8"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer8;
-                    }
-                    if (string.Equals(args[a], "--layer9"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer9;
-                    }
-                    if (string.Equals(args[a], "--layer10"))
-                    {
-                        NodeSettings.Layer = Notus.Variable.Enum.NetworkLayer.Layer10;
-                    }
-                }
-
-                if (NodeSettings.Layer != Notus.Variable.Enum.NetworkLayer.Layer1)
-                {
-                    CryptoTimerActive = false;
-                    EmptyTimerActive = false;
-                }
-            }
-            else
-            {
-                Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
-                Console.ReadLine();
-                //Notus.Variable.Struct.NodeInfo Settings;
-                using (Notus.Validator.Menu menuObj = new Notus.Validator.Menu())
-                {
-                    menuObj.Start();
-                    NodeSettings=menuObj.DefineMySetting(NodeSettings);
-                    //Settings = menuObj.Settings;
-                }
-                Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
-
-                Console.ReadLine();
+                Notus.Validator.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
             }
         }
     }
