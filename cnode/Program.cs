@@ -5,11 +5,6 @@ namespace cnode
 {
     class Program
     {
-        private static bool LightNodeActive = false;
-        private static bool EmptyTimerActive = false;
-        private static bool CryptoTimerActive = false;
-        private static Notus.Variable.Common.ClassSetting NodeSettings = new Notus.Variable.Common.ClassSetting();
-
         private static void FirstChanceExceptionEventHandler(object sender, FirstChanceExceptionEventArgs e)
         {
             Console.WriteLine(e.Exception.Message, "Unhandled FirstChanceExceptionEventArgs Exception");
@@ -71,31 +66,10 @@ namespace cnode
                 http://94.101.87.42:5000/transaction/status/_Kayıt_Esnasında_Verilen_Uid_Değeri
             */
 
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            using (Notus.Validator.Menu menuObj = new Notus.Validator.Menu())
-            {
-                NodeSettings = menuObj.PreStart(args);
-
-                menuObj.Start();
-                NodeSettings = menuObj.DefineMySetting(NodeSettings);
-                Notus.Toolbox.IO.NodeFolderControl(NodeSettings.Network, NodeSettings.Layer);
-            }
-            if (NodeSettings.NodeType != Notus.Variable.Enum.NetworkNodeType.Replicant)
-            {
-                LightNodeActive = false;
-            }
-            CryptoTimerActive = true;
-
-            Console.WriteLine(JsonSerializer.Serialize(NodeSettings, new JsonSerializerOptions() { WriteIndented = true }));
-            Console.ReadLine();
-
-            if (NodeSettings.DevelopmentNode == true)
-            {
-                NodeSettings.Network = Notus.Variable.Enum.NetworkType.DevNet;
-
-                Notus.Validator.Node.Start(NodeSettings, EmptyTimerActive, CryptoTimerActive, LightNodeActive);
-            }
+            Notus.Validator.Node.Start(args);
         }
     }
 }
