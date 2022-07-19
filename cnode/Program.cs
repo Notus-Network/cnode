@@ -77,14 +77,7 @@ namespace cnode
             //AppDomain.CurrentDomain.MonitoringSurvivedMemorySize
             //AppDomain.CurrentDomain.MonitoringTotalProcessorTime
             //AppDomain.CurrentDomain.FirstChanceException += FirstChanceExceptionEventHandler;
-
-
-
-            using (Notus.Validator.Node nodeObj = new Notus.Validator.Node())
-            {
-                nodeObj.Prepare(args);
-                nodeObj.PreStart();
-            }
+            Notus.Validator.Node.Start(args);
         }
     }
 }

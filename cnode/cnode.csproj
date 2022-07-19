@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Notus.Core" Version="4.0.20" />
+    <PackageReference Include="Notus.Core" Version="4.0.68" />
   </ItemGroup>
 
 </Project>
