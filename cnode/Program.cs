@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
-using System.Text.Json;
 namespace cnode
 {
     class Program
     {
-
-        //private static bool LightNodeActive = false;
-        //private static bool EmptyTimerActive = false;
-        //private static bool CryptoTimerActive = false;
-
         private static void FirstChanceExceptionEventHandler(object sender, FirstChanceExceptionEventArgs e)
         {
             Console.WriteLine(e.Exception.Message, "Unhandled FirstChanceExceptionEventArgs Exception");
